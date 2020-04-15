@@ -11,6 +11,7 @@ export const Form = styled.form`
     padding: 10px 15px;
     border-radius: 4px;
     font-size: 16px;
+    background: ${(props) => (props.primary ? 'palevioletred' : 'white')};
   }
 `;
 
@@ -19,8 +20,6 @@ const rotate = keyframes`
     transform: rotate(0deg);
   }
   to {Failed to compile
-./src/pages/Repository/index.js
-Attempted import error: 'Loading' is not exported from './styles'.
     transform: rotate(360deg);
   }
 `;
