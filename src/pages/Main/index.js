@@ -46,7 +46,7 @@ export default class Main extends Component {
 
     try {
       if (exists) {
-        throw new Error('Repositório já existe.');
+        throw new Error('Repositório duplicado');
       }
 
       const response = await api.get(`/repos/${newRepo}`);

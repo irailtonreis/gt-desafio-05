@@ -29,7 +29,7 @@ export default class Repository extends Component {
 
     const [repository, issues] = await Promise.all([
       api.get(`/repos/${repoName}`),
-      api.get(`/repos/${repoName}/issues`, {
+      api.get(`/repos/${repoName}/issues?state=all`, {
         params: {
           state: 'open',
           per_page: 5,
