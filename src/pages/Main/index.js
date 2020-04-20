@@ -44,11 +44,11 @@ export default class Main extends Component {
 
     const exists = repositories.find((repo) => repo.name === newRepo);
 
-    try {
-      if (exists) {
-        throw new Error('Repositório duplicado');
-      }
+    if (exists) {
+      throw new Error('Repositório duplicado');
+    }
 
+    try {
       const response = await api.get(`/repos/${newRepo}`);
 
       const data = {

@@ -18,8 +18,12 @@ export default class Repository extends Component {
 
   state = {
     repository: {},
-    issues: [],
+    issuesAll: [],
+    issuesOpen: [],
     loading: true,
+    all: false,
+    open: false,
+    closed: false,
   };
 
   async componentDidMount() {
@@ -27,25 +31,48 @@ export default class Repository extends Component {
 
     const repoName = decodeURIComponent(match.params.repository);
 
-    const [repository, issues] = await Promise.all([
+    const [repository, issues, issuesOpen] = await Promise.all([
       api.get(`/repos/${repoName}`),
-      api.get(`/repos/${repoName}/issues?state=all`, {
+      api.get(`/repos/${repoName}/issues`, {
+        params: {
+          state: 'all',
+          per_page: 10,
+        },
+      }),
+
+      api.get(`/repos/${repoName}/issues`, {
         params: {
           state: 'open',
-          per_page: 5,
+          per_page: 10,
         },
       }),
     ]);
 
     this.setState({
       repository: repository.data,
-      issues: issues.data,
+      issuesAll: issues.data,
+      issuesOpen: issuesOpen.data,
       loading: false,
     });
   }
 
+  componentDidUpdate() {
+    const { all } = this.state;
+    handleSelectChange = (e) => {
+      console.log(e.target.value);
+    };
+  }
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const {
+      repository,
+      issuesAll,
+      issuesOpen,
+      loading,
+      all,
+      open,
+      closed,
+    } = this.state;
 
     if (loading) {
       return <Loading>Carregando...</Loading>;
@@ -61,9 +88,19 @@ export default class Repository extends Component {
           <h1>{repository.name}</h1>
           <p>{repository.description}</p>
         </Owner>
-
+        <select id="cars" name="carlist" form="carform">
+          <option onChange={this.handleSelectChange} value={all}>
+            All
+          </option>
+          <option onChange={this.handleSelectChange} value={open}>
+            Open
+          </option>
+          <option onChange={this.handleSelectChange} value={closed}>
+            Closed
+          </option>
+        </select>
         <IssueList>
-          {issues.map((issue) => (
+          {issuesOpen.map((issue) => (
             <li key={String(issue.id)}>
               <img src={issue.user.avatar_url} alt={issue.user.login} />
               <div>
