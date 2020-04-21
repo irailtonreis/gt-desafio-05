@@ -34,7 +34,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     "react/prefer-stateless-function": "off",
     "react/state-in-constructor": "off",
-    "react/no-unused-state": 'off'
+    "react/no-unused-state": 'off',
   }
 
 };

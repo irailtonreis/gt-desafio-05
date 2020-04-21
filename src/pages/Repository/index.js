@@ -18,12 +18,9 @@ export default class Repository extends Component {
 
   state = {
     repository: {},
-    issuesAll: [],
-    issuesOpen: [],
     loading: true,
-    all: false,
-    open: false,
-    closed: false,
+    issues: [],
+    filter: '',
   };
 
   async componentDidMount() {
@@ -31,7 +28,7 @@ export default class Repository extends Component {
 
     const repoName = decodeURIComponent(match.params.repository);
 
-    const [repository, issues, issuesOpen] = await Promise.all([
+    const [repository, issues] = await Promise.all([
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
@@ -39,40 +36,47 @@ export default class Repository extends Component {
           per_page: 10,
         },
       }),
-
-      api.get(`/repos/${repoName}/issues`, {
-        params: {
-          state: 'open',
-          per_page: 10,
-        },
-      }),
     ]);
 
     this.setState({
       repository: repository.data,
-      issuesAll: issues.data,
-      issuesOpen: issuesOpen.data,
+      issues: issues.data,
       loading: false,
     });
   }
 
-  componentDidUpdate() {
-    const { all } = this.state;
-    handleSelectChange = (e) => {
-      console.log(e.target.value);
-    };
+  async componentDidUpdate(_, prevState) {
+    const { match } = this.props;
+
+    const { filter } = this.state;
+
+    const repoName = decodeURIComponent(match.params.repository);
+
+    if (prevState.issues !== filter) {
+      const [repository, issues] = await Promise.all([
+        api.get(`/repos/${repoName}`),
+        api.get(`/repos/${repoName}/issues`, {
+          params: {
+            state: `${filter}`,
+            per_page: 5,
+          },
+        }),
+      ]);
+
+      this.setState({
+        repository: repository.data,
+        issues: issues.data,
+        loading: false,
+      });
+    }
   }
 
+  handleSelectChange = (e) => {
+    this.setState({ filter: e.target.value });
+  };
+
   render() {
-    const {
-      repository,
-      issuesAll,
-      issuesOpen,
-      loading,
-      all,
-      open,
-      closed,
-    } = this.state;
+    const { repository, loading, issues } = this.state;
 
     if (loading) {
       return <Loading>Carregando...</Loading>;
@@ -88,19 +92,20 @@ export default class Repository extends Component {
           <h1>{repository.name}</h1>
           <p>{repository.description}</p>
         </Owner>
-        <select id="cars" name="carlist" form="carform">
-          <option onChange={this.handleSelectChange} value={all}>
-            All
-          </option>
-          <option onChange={this.handleSelectChange} value={open}>
-            Open
-          </option>
-          <option onChange={this.handleSelectChange} value={closed}>
-            Closed
-          </option>
+
+        <select
+          id="cars"
+          name="carlist"
+          form="carform"
+          onChange={this.handleSelectChange}
+        >
+          <option value="all">All</option>
+          <option value="open">Open</option>
+          <option value="closed">Closed</option>
         </select>
+
         <IssueList>
-          {issuesOpen.map((issue) => (
+          {issues.map((issue) => (
             <li key={String(issue.id)}>
               <img src={issue.user.avatar_url} alt={issue.user.login} />
               <div>
