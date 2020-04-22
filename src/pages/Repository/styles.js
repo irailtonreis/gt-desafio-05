@@ -10,6 +10,32 @@ export const Loading = styled.div`
   height: 100vh;
 `;
 
+export const Pagination = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0 10px;
+
+  button {
+    padding: 10px;
+    color: #fff;
+    background: #7159c1;
+    border: none;
+    border-radius: 4px;
+    text-transform: uppercase;
+    transition: background 0.2s;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+`;
+
 export const Owner = styled.header`
   display: flex;
   flex-direction: column;

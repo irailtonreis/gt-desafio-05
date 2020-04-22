@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, IssueList, Pagination } from './styles';
 
 export default class Repository extends Component {
   // eslint-disable-next-line react/static-property-placement
@@ -20,24 +20,26 @@ export default class Repository extends Component {
     repository: {},
     loading: true,
     issues: [],
-    filter: '',
+    filter: 'all',
+    page: 1,
   };
 
   async componentDidMount() {
     const { match } = this.props;
 
     const repoName = decodeURIComponent(match.params.repository);
-
+    const { page } = this.state;
     const [repository, issues] = await Promise.all([
       api.get(`/repos/${repoName}`),
-      api.get(`/repos/${repoName}/issues`, {
+      api.get(`/repos/${repoName}/issues?page=4`, {
         params: {
           state: 'all',
-          per_page: 10,
+          per_page: 5,
+          page,
         },
       }),
     ]);
-
+    console.log(issues);
     this.setState({
       repository: repository.data,
       issues: issues.data,
@@ -52,13 +54,13 @@ export default class Repository extends Component {
 
     const repoName = decodeURIComponent(match.params.repository);
 
-    if (prevState.issues !== filter) {
+    if (prevState.filter !== filter) {
       const [repository, issues] = await Promise.all([
         api.get(`/repos/${repoName}`),
         api.get(`/repos/${repoName}/issues`, {
           params: {
             state: `${filter}`,
-            per_page: 5,
+            per_page: 10,
           },
         }),
       ]);
@@ -75,8 +77,15 @@ export default class Repository extends Component {
     this.setState({ filter: e.target.value });
   };
 
+  handlePagination = async (action) => {
+    const { page } = this.state;
+    this.setState({
+      page: action === 'back' ? page - 1 : page + 1,
+    });
+  };
+
   render() {
-    const { repository, loading, issues } = this.state;
+    const { repository, loading, issues, page } = this.state;
 
     if (loading) {
       return <Loading>Carregando...</Loading>;
@@ -120,6 +129,19 @@ export default class Repository extends Component {
             </li>
           ))}
         </IssueList>
+        <Pagination>
+          <button
+            type="button"
+            disabled={page < 2}
+            onClick={() => this.handlePagination('back')}
+          >
+            Anterior
+          </button>
+          <span>Página {page} </span>
+          <button type="button" onClick={() => this.handlePagination('next')}>
+            Próximo
+          </button>
+        </Pagination>
       </Container>
     );
   }
