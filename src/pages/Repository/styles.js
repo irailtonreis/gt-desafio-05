@@ -36,6 +36,13 @@ export const Pagination = styled.div`
   }
 `;
 
+export const Filter = styled.select`
+  display: flex;
+  width: 250px;
+  background: #7159c1;
+  height: 48px;
+`;
+
 export const Owner = styled.header`
   display: flex;
   flex-direction: column;

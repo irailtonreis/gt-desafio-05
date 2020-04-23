@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList, Pagination } from './styles';
+import { Loading, Owner, IssueList, Pagination, Filter } from './styles';
 
 export default class Repository extends Component {
   // eslint-disable-next-line react/static-property-placement
@@ -39,7 +39,6 @@ export default class Repository extends Component {
         },
       }),
     ]);
-    console.log(issues);
     this.setState({
       repository: repository.data,
       issues: issues.data,
@@ -47,34 +46,60 @@ export default class Repository extends Component {
     });
   }
 
-  async componentDidUpdate(_, prevState) {
+  // async componentDidUpdate(_, prevState) {
+  //   const { match } = this.props;
+
+  //   const { filter } = this.state;
+
+  //   const repoName = decodeURIComponent(match.params.repository);
+
+  //   if (prevState.filter !== filter) {
+  //     const [repository, issues] = await Promise.all([
+  //       api.get(`/repos/${repoName}`),
+  //       api.get(`/repos/${repoName}/issues`, {
+  //         params: {
+  //           state: `${filter}`,
+  //           per_page: 10,
+  //         },
+  //       }),
+  //     ]);
+
+  //     this.setState({
+  //       repository: repository.data,
+  //       issues: issues.data,
+  //       loading: false,
+  //     });
+  //   }
+  // }
+
+  loadIssues = async () => {
     const { match } = this.props;
 
-    const { filter } = this.state;
+    const { filter, page } = this.state;
 
     const repoName = decodeURIComponent(match.params.repository);
 
-    if (prevState.filter !== filter) {
-      const [repository, issues] = await Promise.all([
-        api.get(`/repos/${repoName}`),
-        api.get(`/repos/${repoName}/issues`, {
-          params: {
-            state: `${filter}`,
-            per_page: 10,
-          },
-        }),
-      ]);
+    const [repository, issues] = await Promise.all([
+      api.get(`/repos/${repoName}`),
+      api.get(`/repos/${repoName}/issues`, {
+        params: {
+          state: `${filter}`,
+          per_page: 5,
+          page,
+        },
+      }),
+    ]);
 
-      this.setState({
-        repository: repository.data,
-        issues: issues.data,
-        loading: false,
-      });
-    }
-  }
+    this.setState({
+      repository: repository.data,
+      issues: issues.data,
+      loading: false,
+    });
+  };
 
-  handleSelectChange = (e) => {
-    this.setState({ filter: e.target.value });
+  handleSelectChange = async (e) => {
+    await this.setState({ filter: e.target.value });
+    this.loadIssues();
   };
 
   handlePagination = async (action) => {
@@ -82,6 +107,8 @@ export default class Repository extends Component {
     this.setState({
       page: action === 'back' ? page - 1 : page + 1,
     });
+
+    this.loadIssues();
   };
 
   render() {
@@ -102,17 +129,16 @@ export default class Repository extends Component {
           <p>{repository.description}</p>
         </Owner>
 
-        <select
+        <Filter
           id="cars"
           name="carlist"
           form="carform"
-          onChange={this.handleSelectChange}
+          onClick={this.handleSelectChange}
         >
           <option value="all">All</option>
           <option value="open">Open</option>
           <option value="closed">Closed</option>
-        </select>
-
+        </Filter>
         <IssueList>
           {issues.map((issue) => (
             <li key={String(issue.id)}>
