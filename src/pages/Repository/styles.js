@@ -36,11 +36,19 @@ export const Pagination = styled.div`
   }
 `;
 
-export const Filter = styled.select`
+export const Filter = styled.div`
   display: flex;
-  width: 250px;
-  background: #7159c1;
-  height: 48px;
+  justify-content: center;
+  padding-top: 10px;
+  select {
+    width: 250px;
+    background: #7159c1;
+    height: 48px;
+    border-radius: 4px;
+    font-size: 18px;
+    padding: 13px 20px 13px 12px;
+    color: #fff;
+  }
 `;
 
 export const Owner = styled.header`

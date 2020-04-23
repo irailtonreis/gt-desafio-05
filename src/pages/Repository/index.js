@@ -129,15 +129,17 @@ export default class Repository extends Component {
           <p>{repository.description}</p>
         </Owner>
 
-        <Filter
-          id="cars"
-          name="carlist"
-          form="carform"
-          onClick={this.handleSelectChange}
-        >
-          <option value="all">All</option>
-          <option value="open">Open</option>
-          <option value="closed">Closed</option>
+        <Filter>
+          <select
+            id="cars"
+            name="carlist"
+            form="carform"
+            onClick={this.handleSelectChange}
+          >
+            <option value="all">Todas</option>
+            <option value="open">Aberto</option>
+            <option value="closed">Fechado</option>
+          </select>
         </Filter>
         <IssueList>
           {issues.map((issue) => (
