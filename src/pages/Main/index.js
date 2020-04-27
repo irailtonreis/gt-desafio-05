@@ -10,7 +10,7 @@ export default class Main extends Component {
     newRepo: '',
     repositories: [],
     loading: false,
-    error: false,
+    error: null,
   };
 
   // Carregar os dados do localStorage
@@ -42,11 +42,11 @@ export default class Main extends Component {
 
     const { newRepo, repositories } = this.state;
 
+    if (newRepo === '') throw new Error('Você precisa indicar um repositório');
+
     const exists = repositories.find((repo) => repo.name === newRepo);
 
-    if (exists) {
-      throw new Error('Repositório duplicado');
-    }
+    if (exists) throw Error('Repositório duplicado');
 
     try {
       const response = await api.get(`/repos/${newRepo}`);
